@@ -3,7 +3,8 @@
  * telegram_sender.php
  * ฟังก์ชันสำหรับส่งข้อความไปยัง Telegram Bot API
  */
-function sendTelegramMessage($botToken, $chatId, $message) {
+function sendTelegramMessage($botToken, $chatId, $message)
+{
     // URL ของ Telegram API
     $apiUrl = "https://api.telegram.org/bot{$botToken}/sendMessage";
 
@@ -22,13 +23,17 @@ function sendTelegramMessage($botToken, $chatId, $message) {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 10); // ตั้งเวลา timeout 10 วินาที
 
+    // SSL options for Windows compatibility
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
     // ทำการ execute request
     $response = curl_exec($ch);
-    
+
     // ตรวจสอบ error (ถ้ามี)
     if (curl_errno($ch)) {
-        // ในระบบจริง ควรจะบันทึก error ลง log file
-        // error_log('Telegram cURL Error: ' . curl_error($ch));
+        // Log error to file for debugging
+        error_log('Telegram cURL Error: ' . curl_error($ch));
     }
 
     // ปิดการเชื่อมต่อ cURL
