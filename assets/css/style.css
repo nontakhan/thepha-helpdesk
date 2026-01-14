@@ -1,0 +1,12 @@
+/* assets/css/style.css */
+
+/* กำหนดฟอนต์ Kanit ให้กับทุกส่วนของหน้า */
+body {
+    font-family: 'Sarabun', sans-serif;
+}
+
+/* ปรับฟอนต์ของ Select2 ในส่วน Admin ให้เป็น Kanit ด้วย */
+.select2-container--bootstrap-5 .select2-selection,
+.select2-results__option {
+    font-family: 'Sarabun', sans-serif;
+}
