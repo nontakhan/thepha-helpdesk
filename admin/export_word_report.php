@@ -1,10 +1,11 @@
 <?php
+ob_start(); // Start output buffering
 require_once '../db_connect.php';
 
 // --- รับค่าจากฟอร์มตัวกรอง ---
 $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
 $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
-$admin_id = isset($_GET['admin_id']) ? (int)$_GET['admin_id'] : 0;
+$admin_id = isset($_GET['admin_id']) ? (int) $_GET['admin_id'] : 0;
 
 if ($admin_id === 0) {
     die("กรุณาเลือกเจ้าหน้าที่ก่อนทำการ Export");
@@ -60,7 +61,7 @@ ksort($grouped_tasks); // เรียงวันที่จากน้อย
 
 // ===== ส่วนที่แก้ไข: เรียงลำดับงานภายในแต่ละวันตามเวลา =====
 foreach ($grouped_tasks as $date => &$day_tasks) {
-    usort($day_tasks, function($a, $b) {
+    usort($day_tasks, function ($a, $b) {
         return strtotime($a['start_time']) - strtotime($b['start_time']);
     });
 }
@@ -69,44 +70,92 @@ unset($day_tasks); // ตัด Reference เพื่อความปลอ�
 
 // --- สร้างเนื้อหา HTML สำหรับไฟล์ Word ---
 $report_month_th = [
-    'January' => 'มกราคม', 'February' => 'กุมภาพันธ์', 'March' => 'มีนาคม',
-    'April' => 'เมษายน', 'May' => 'พฤษภาคม', 'June' => 'มิถุนายน',
-    'July' => 'กรกฎาคม', 'August' => 'สิงหาคม', 'September' => 'กันยายน',
-    'October' => 'ตุลาคม', 'November' => 'พฤศจิกายน', 'December' => 'ธันวาคม'
+    'January' => 'มกราคม',
+    'February' => 'กุมภาพันธ์',
+    'March' => 'มีนาคม',
+    'April' => 'เมษายน',
+    'May' => 'พฤษภาคม',
+    'June' => 'มิถุนายน',
+    'July' => 'กรกฎาคม',
+    'August' => 'สิงหาคม',
+    'September' => 'กันยายน',
+    'October' => 'ตุลาคม',
+    'November' => 'พฤศจิกายน',
+    'December' => 'ธันวาคม'
 ];
 $report_month_en = date('F', strtotime($start_date));
 $report_month = $report_month_th[$report_month_en];
 $report_year = date('Y', strtotime($start_date)) + 543;
 $filename = "Report-" . $admin_id . "-" . date("Y-m-d") . ".doc";
 
-// --- ตั้งค่า Headers สำหรับดาวน์โหลด ---
+// --- Clear output buffer and set headers for download ---
+ob_end_clean();
 header("Content-Type: application/vnd.ms-word; charset=UTF-8");
-header("Expires: 0");
-header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 header("Content-Disposition: attachment; filename=\"$filename\"");
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: 0");
 
 ?>
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <title>รายงานการปฏิบัติงาน</title>
     <style>
         @page {
             size: A4;
-            margin: 2.5cm 2cm 2.5cm 3cm; /* บน ขวา ล่าง ซ้าย */
+            margin: 2.5cm 2cm 2.5cm 3cm;
+            /* บน ขวา ล่าง ซ้าย */
         }
-        body { font-family: 'TH SarabunPSK', 'Angsana New', sans-serif; font-size: 16pt; }
-        .report-table { border-collapse: collapse; width: 100%; }
-        .report-table th, .report-table td { border: 1px solid black; padding: 8px; vertical-align: top; }
-        .header-text { text-align: center; }
-        .info-text { text-align: left; padding-left: 50px; line-height: 1.5; }
-        .signature-col { width: 25%; }
-        .date-col { width: 15%; text-align: center; }
-        .time-col { width: 20%; text-align: center; }
-        .task-col { width: 40%; }
+
+        body {
+            font-family: 'TH SarabunPSK', 'Angsana New', sans-serif;
+            font-size: 16pt;
+        }
+
+        .report-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .report-table th,
+        .report-table td {
+            border: 1px solid black;
+            padding: 8px;
+            vertical-align: top;
+        }
+
+        .header-text {
+            text-align: center;
+        }
+
+        .info-text {
+            text-align: left;
+            padding-left: 50px;
+            line-height: 1.5;
+        }
+
+        .signature-col {
+            width: 25%;
+        }
+
+        .date-col {
+            width: 15%;
+            text-align: center;
+        }
+
+        .time-col {
+            width: 20%;
+            text-align: center;
+        }
+
+        .task-col {
+            width: 40%;
+        }
     </style>
 </head>
+
 <body>
     <div class="header-text">
         <h3>บัญชีการปฏิบัติงานประจำของเจ้าหน้าที่จ้างเหมา</h3>
@@ -138,11 +187,12 @@ header("Content-Disposition: attachment; filename=\"$filename\"");
                                 <?php echo date('d/m/Y', strtotime($date)); ?>
                             </td>
                         <?php endif; ?>
-                        
+
                         <td class="time-col">
-                            <?php echo date('H:i', strtotime($task['start_time'])); ?> - <?php echo date('H:i', strtotime($task['end_time'])); ?>
+                            <?php echo date('H:i', strtotime($task['start_time'])); ?> -
+                            <?php echo date('H:i', strtotime($task['end_time'])); ?>
                         </td>
-                        
+
                         <td class="task-col">
                             <?php echo htmlspecialchars($task['title']); ?>
                         </td>
@@ -162,4 +212,5 @@ header("Content-Disposition: attachment; filename=\"$filename\"");
         </tbody>
     </table>
 </body>
+
 </html>

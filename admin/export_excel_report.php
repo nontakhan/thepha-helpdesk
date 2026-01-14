@@ -1,11 +1,12 @@
 <?php
+ob_start(); // Start output buffering
 require_once '../db_connect.php';
 
 // --- รับค่าจากฟอร์มตัวกรอง ---
 $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
 $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
-// รับค่า reporter_id (ซึ่งในบริบทนี้คือ admin_id ที่เราส่งมาจากหน้า report)
-$admin_id = isset($_GET['reporter_id']) ? (int)$_GET['reporter_id'] : 0;
+// รับค่า admin_id จากหน้า activity_report
+$admin_id = isset($_GET['admin_id']) ? (int) $_GET['admin_id'] : 0;
 
 // --- ดึงข้อมูลชื่อเจ้าหน้าที่ (สำหรับแสดงหัวกระดาษ) ---
 $header_admin_name = "ทั้งหมด";
@@ -88,34 +89,56 @@ while ($row = $result_act->fetch_assoc()) {
 $stmt_act->close();
 
 // เรียงลำดับตามเวลา
-usort($tasks, function($a, $b) {
+usort($tasks, function ($a, $b) {
     return strtotime($a['task_date']) - strtotime($b['task_date']);
 });
 
-// --- ตั้งค่า Header สำหรับดาวน์โหลด ---
+// --- Clear output buffer and set headers for download ---
+ob_end_clean();
 $filename = "Activity_Report_" . date("Y-m-d") . ".xls";
-header("Content-Type: application/vnd.ms-excel");
+header("Content-Type: application/vnd.ms-excel; charset=utf-8");
 header("Content-Disposition: attachment; filename=\"$filename\"");
 header("Pragma: no-cache");
+header("Cache-Control: no-cache, must-revalidate");
 header("Expires: 0");
 
 ?>
 <!DOCTYPE html>
-<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"
+    xmlns="http://www.w3.org/TR/REC-html40">
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<style>
-    body { font-family: 'Sarabun', sans-serif; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #000; padding: 5px; vertical-align: top; }
-    th { background-color: #f2f2f2; text-align: center; }
-</style>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 5px;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+    </style>
 </head>
+
 <body>
     <h3 style="text-align: center;">รายงานกิจกรรมเจ้าหน้าที่</h3>
     <p>
         <b>เจ้าหน้าที่:</b> <?php echo htmlspecialchars($header_admin_name); ?><br>
-        <b>วันที่:</b> <?php echo date('d/m/Y', strtotime($start_date)); ?> ถึง <?php echo date('d/m/Y', strtotime($end_date)); ?>
+        <b>วันที่:</b> <?php echo date('d/m/Y', strtotime($start_date)); ?> ถึง
+        <?php echo date('d/m/Y', strtotime($end_date)); ?>
     </p>
 
     <table>
@@ -130,21 +153,22 @@ header("Expires: 0");
             </tr>
         </thead>
         <tbody>
-            <?php 
+            <?php
             $i = 1;
-            foreach ($tasks as $task): 
+            foreach ($tasks as $task):
                 $duration = ($task['task_type'] == 'ลา' || ($task['task_type'] == 'งานซ่อม' && !isset($task['duration_minutes']))) ? '-' : $task['duration_minutes'];
-            ?>
-            <tr>
-                <td style="text-align: center;"><?php echo $i++; ?></td>
-                <td><?php echo date('d/m/Y H:i', strtotime($task['task_date'])); ?></td>
-                <td><?php echo htmlspecialchars($task['owner_name'] ?? '-'); ?></td> <!-- แสดงชื่อเจ้าหน้าที่ -->
-                <td><?php echo htmlspecialchars($task['task_type']); ?></td>
-                <td><?php echo htmlspecialchars($task['task_title']); ?></td>
-                <td style="text-align: center;"><?php echo $duration; ?></td>
-            </tr>
+                ?>
+                <tr>
+                    <td style="text-align: center;"><?php echo $i++; ?></td>
+                    <td><?php echo date('d/m/Y H:i', strtotime($task['task_date'])); ?></td>
+                    <td><?php echo htmlspecialchars($task['owner_name'] ?? '-'); ?></td> <!-- แสดงชื่อเจ้าหน้าที่ -->
+                    <td><?php echo htmlspecialchars($task['task_type']); ?></td>
+                    <td><?php echo htmlspecialchars($task['task_title']); ?></td>
+                    <td style="text-align: center;"><?php echo $duration; ?></td>
+                </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
 </body>
+
 </html>
