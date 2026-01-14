@@ -1,12 +1,18 @@
 <?php
 /**
  * config.php
- * ไฟล์สำหรับเก็บค่าตั้งค่าต่างๆ ของระบบ
+ * ไฟล์สำหรับตั้งค่าต่างๆ ของระบบ Thepha Helpdesk
  */
 
-// --- Telegram Bot Settings ---
-// กรุณากรอกข้อมูลที่คุณได้มาจาก BotFather และ @get_id_bot
-define('TELEGRAM_BOT_TOKEN', '8570602722:AAG6TihRzLFKf00Hn0GFpDVsm9ZToQaG-54'); // ใส่ Bot Token ของคุณที่นี่
-define('TELEGRAM_CHAT_ID', '-4901210895');   // ใส่ Chat ID ของกลุ่มคุณที่นี่ (ต้องขึ้นต้นด้วย -)
+// โหลด environment variables จาก .env (ถ้ายังไม่ได้โหลด)
+if (!function_exists('env')) {
+    require_once __DIR__ . '/env_loader.php';
+}
 
-?>
+// --- ชื่อระบบ ---
+define('APP_NAME', 'Thepha Helpdesk');
+
+// --- Telegram Bot Settings ---
+// ค่าจะถูกอ่านจากไฟล์ .env โดยอัตโนมัติ
+define('TELEGRAM_BOT_TOKEN', env('TELEGRAM_BOT_TOKEN', 'YOUR_BOT_TOKEN_HERE'));
+define('TELEGRAM_CHAT_ID', env('TELEGRAM_CHAT_ID', 'YOUR_CHAT_ID_HERE'));
