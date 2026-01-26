@@ -10,3 +10,62 @@ body {
 .select2-results__option {
     font-family: 'Sarabun', sans-serif;
 }
+
+/* Report Page Enhancements */
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+/* Summary Cards */
+.card[style*="linear-gradient"] {
+    border-radius: 12px;
+}
+
+.card[style*="linear-gradient"] .card-body {
+    border-radius: 12px;
+}
+
+/* Table Hover Effect */
+.table-hover tbody tr:hover {
+    background-color: rgba(102, 126, 234, 0.08);
+}
+
+/* Badge Improvements */
+.badge {
+    font-weight: 500;
+}
+
+/* Modal Styling */
+#detailModal .modal-header {
+    border-radius: 0;
+}
+
+#detailModal .modal-content {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .card[style*="linear-gradient"] h2 {
+        font-size: 1.5rem;
+    }
+
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+}
+
+/* No SLA Row Styling */
+.table tbody tr.table-secondary {
+    background-color: rgba(108, 117, 125, 0.15) !important;
+    font-style: italic;
+}
+
+.table tbody tr.table-secondary td {
+    color: #6c757d;
+}
