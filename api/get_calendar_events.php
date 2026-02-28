@@ -110,6 +110,45 @@ if ($admin_id > 0) {
     }
 }
 
+// 3. ดึงข้อมูล "วันหยุด" (holidays) - แสดงให้ทุกคน
+try {
+    $sql_holidays = "SELECT id, holiday_date, holiday_name FROM holidays ORDER BY holiday_date ASC";
+    $result_holidays = $conn->query($sql_holidays);
+    if ($result_holidays) {
+        while ($row = $result_holidays->fetch_assoc()) {
+            $events[] = [
+                'id' => 'hol_' . $row['id'],
+                'title' => $row['holiday_name'],
+                'start' => $row['holiday_date'],
+                'allDay' => true,
+                'display' => 'background',
+                'color' => '#dc3545',
+                'textColor' => '#fff',
+                'extendedProps' => [
+                    'type' => 'วันหยุด',
+                    'holiday_name' => $row['holiday_name']
+                ]
+            ];
+            // เพิ่ม event แบบข้อความด้วยเพื่อให้เห็นชื่อวันหยุด
+            $events[] = [
+                'id' => 'hol_label_' . $row['id'],
+                'title' => '🔴 ' . $row['holiday_name'],
+                'start' => $row['holiday_date'],
+                'allDay' => true,
+                'color' => '#dc3545',
+                'textColor' => '#fff',
+                'editable' => false,
+                'extendedProps' => [
+                    'type' => 'วันหยุด',
+                    'holiday_name' => $row['holiday_name']
+                ]
+            ];
+        }
+    }
+} catch (Exception $e) {
+    // Handle error if needed
+}
+
 $conn->close();
 echo json_encode($events);
 ?>

@@ -72,6 +72,8 @@ if (!isset($_SESSION['admin_id'])) {
                 <li><a class="dropdown-item" href="manage_categories.php">จัดการประเภทงานซ่อม</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="manage_activity_types.php">จัดการประเภทกิจกรรม</a></li>
+                <li><a class="dropdown-item" href="manage_admins.php">จัดการเจ้าหน้าที่ซ่อม</a></li>
+                <li><a class="dropdown-item" href="manage_holidays.php">จัดการวันหยุด</a></li>
             </ul>
         </li>
       </ul>

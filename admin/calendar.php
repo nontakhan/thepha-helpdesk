@@ -2,8 +2,8 @@
 require_once 'partials/header.php';
 require_once '../db_connect.php';
 
-// ดึงข้อมูลสำหรับ Dropdowns
-$admins = $conn->query("SELECT id, full_name FROM admins ORDER BY full_name ASC");
+// ดึงข้อมูลสำหรับ Dropdowns (เฉพาะ admin ที่ใช้งาน)
+$admins = $conn->query("SELECT id, full_name FROM admins WHERE status = 'Y' ORDER BY full_name ASC");
 $activity_types = $conn->query("SELECT id, type_name, color FROM activity_types ORDER BY type_name ASC");
 
 $current_admin_id = isset($_SESSION['admin_id']) ? (int) $_SESSION['admin_id'] : 0;
@@ -88,7 +88,8 @@ require_once 'partials/footer.php';
             },
             locale: 'th',
             buttonText: { today: 'วันนี้', month: 'เดือน', week: 'สัปดาห์', day: 'วัน' },
-            allDaySlot: false,
+            allDaySlot: true,
+            allDayText: 'ทั้งวัน',
             nowIndicator: true,
             slotMinTime: '06:00:00',
             slotMaxTime: '20:00:00',
@@ -101,7 +102,19 @@ require_once 'partials/footer.php';
                 $('#eventModalLabel').text("รายละเอียด: " + event.title);
                 currentEventId = event.id.replace('act_', '');
 
-                if (props.type !== 'งานซ่อม') {
+                if (props.type === 'วันหยุด') {
+                    // ===== วันหยุด: แสดงข้อมูลอย่างเดียว =====
+                    var holidayHtml = `
+                    <div class="text-center py-4">
+                        <i class="bi bi-calendar-x-fill text-danger" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3 text-danger">${props.holiday_name}</h4>
+                        <p class="text-muted">วันหยุดราชการ / วันหยุดพิเศษ</p>
+                    </div>`;
+                    $('#eventModalBody').html(holidayHtml);
+                    $('#eventModalFooter').html(`
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    `);
+                } else if (props.type !== 'งานซ่อม') {
                     // ===== สร้างปุ่มสีสำหรับประเภทกิจกรรม =====
                     var currentTypeId = props.type_id || 0;
                     var activityTypeButtons = activityTypes.map(function (t) {

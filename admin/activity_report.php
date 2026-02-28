@@ -2,8 +2,8 @@
 require_once 'partials/header.php';
 require_once '../db_connect.php';
 
-// --- ดึงข้อมูลสำหรับ Dropdowns (ดึงเจ้าหน้าที่ทั้งหมด) ---
-$admins = $conn->query("SELECT id, full_name FROM admins ORDER BY full_name ASC");
+// --- ดึงข้อมูลสำหรับ Dropdowns (ดึงเจ้าหน้าที่ที่ใช้งาน) ---
+$admins = $conn->query("SELECT id, full_name FROM admins WHERE status = 'Y' ORDER BY full_name ASC");
 
 // --- รับค่าจากฟอร์มตัวกรอง ---
 $start_date = isset($_GET['start_date']) && !empty($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
